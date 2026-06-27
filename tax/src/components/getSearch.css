@@ -1,0 +1,364 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI;
+}
+
+body{
+
+    background:#edf3fb;
+
+}
+
+.container{
+
+    width:100%;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:50px;
+
+}
+
+.card{
+
+    width:700px;
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:12px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.1);
+
+}
+
+.card h1{
+
+    text-align:center;
+
+    color:#003366;
+
+    margin-bottom:10px;
+
+}
+
+.subtitle{
+
+    text-align:center;
+
+    color:gray;
+
+    margin-bottom:30px;
+
+}
+
+form{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+}
+
+input{
+
+    width:420px;
+
+    padding:14px;
+
+    border-radius:8px;
+
+    border:1px solid #ccc;
+
+    font-size:18px;
+
+}
+
+button{
+
+    width:140px;
+
+    background:#0066ff;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+}
+
+button:hover{
+
+    background:#004bcc;
+
+}
+
+.loading{
+
+    margin-top:40px;
+
+    text-align:center;
+
+}
+
+.spinner{
+
+    width:50px;
+
+    height:50px;
+
+    border:6px solid #ddd;
+
+    border-top:6px solid #0066ff;
+
+    border-radius:50%;
+
+    animation:spin 1s linear infinite;
+
+    margin:auto;
+
+}
+
+@keyframes spin{
+
+    from{
+
+        transform:rotate(0deg);
+
+    }
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+.errorCard{
+
+    margin-top:30px;
+
+    background:#ffe6e6;
+
+    color:red;
+
+    padding:15px;
+
+    width:700px;
+
+    border-radius:10px;
+
+    font-size:18px;
+
+}
+
+.resultCard{
+
+    width:900px;
+
+    background:white;
+
+    margin-top:40px;
+
+    border-radius:10px;
+
+    padding:30px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.1);
+
+}
+
+.resultCard h2{
+
+    text-align:center;
+
+    margin-bottom:25px;
+
+    color:#003366;
+
+}
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:20px;
+
+}
+
+.grid div{
+
+    background:#f5f7fb;
+
+    padding:15px;
+
+    border-radius:8px;
+
+}
+
+.grid span{
+
+    color:#666;
+
+    font-size:14px;
+
+    display:block;
+
+    margin-bottom:8px;
+
+}
+
+.grid p{
+
+    color:#222;
+
+    font-weight:bold;
+
+}
+
+@media(max-width:900px){
+
+.card{
+
+width:95%;
+
+}
+
+.resultCard{
+
+width:95%;
+
+}
+
+.grid{
+
+grid-template-columns:1fr;
+
+}
+
+form{
+
+flex-direction:column;
+
+}
+
+input{
+
+width:100%;
+
+}
+
+button{
+
+width:100%;
+
+}
+
+}
+.dashboard{
+
+    width:1100px;
+
+    margin-top:40px;
+
+}
+
+.section{
+
+    background:white;
+
+    padding:30px;
+
+    margin-bottom:25px;
+
+    border-radius:15px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.section h2{
+
+    color:#003366;
+
+    margin-bottom:25px;
+
+}
+
+.active{
+
+    background:#d7f8de;
+
+    color:green;
+
+    padding:8px 15px;
+
+    border-radius:30px;
+
+    display:inline-block;
+
+    font-weight:bold;
+
+}
+
+.inactive{
+
+    background:#ffdede;
+
+    color:red;
+
+    padding:8px 15px;
+
+    border-radius:30px;
+
+    display:inline-block;
+
+    font-weight:bold;
+
+}
+
+.fullWidth{
+
+    grid-column:1/3;
+
+}
+
+.websiteContainer{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+    margin-top:20px;
+
+}
+
+.websiteChip{
+
+    background:#0066ff;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:30px;
+
+    font-weight:bold;
+
+}
