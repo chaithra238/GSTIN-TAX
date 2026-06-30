@@ -18,3 +18,4 @@ def search(request):
     result = run_scraper(gstin)
 
     return JsonResponse(result)
+    

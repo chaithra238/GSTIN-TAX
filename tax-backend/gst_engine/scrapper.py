@@ -181,11 +181,33 @@ def website_limit(driver):
     ]
 
     return any(keyword in page for keyword in keywords)
+def has_sufficient_data(data):
+
+    important_fields = [
+
+        "business_name",
+
+        "legal_name",
+
+        "gst_status",
+
+        "registration_date",
+
+        "principal_place"
+
+    ]
+
+    filled = 0
+
+    for field in important_fields:
+
+        if data.get(field):
+
+            filled += 1
+
+    return filled >= 4
+
 def run_scraper(gstin):
-
-    import time
-
-    start_time = time.time()
 
     gstin = gstin.strip().upper()
 
@@ -203,13 +225,11 @@ def run_scraper(gstin):
 
         ("ClearTax", search_cleartax),
 
-        ("GSTVerify", search_gstverify),
+        ("MastersIndia", search_mastersindia),
 
         ("Cashfree", search_cashfree),
 
         ("Razorpay", search_razorpay),
-
-        ("MastersIndia", search_mastersindia),
 
         ("Tally", search_tally)
 
@@ -220,6 +240,8 @@ def run_scraper(gstin):
     final_data["gstin"] = gstin
 
     website_status = {}
+
+    driver = None
 
     try:
 
@@ -256,7 +278,7 @@ def run_scraper(gstin):
 
                     current = final_data.get(key)
 
-                    # Empty field
+                    # Fill empty field
                     if current in [None, ""]:
 
                         final_data[key] = value
@@ -282,15 +304,22 @@ def run_scraper(gstin):
 
                             final_data[key] = value
 
-                    # Keep first business/trade name
+                    # Keep first business name
                     elif key == "business_name":
 
                         pass
 
-                    # General fallback
+                    # Generic fallback
                     elif len(str(value)) > len(str(current)):
 
                         final_data[key] = value
+
+                # Intelligent Fallback
+                if has_sufficient_data(final_data):
+
+                    print("\nEnough GST information collected.")
+
+                    break
 
             except Exception as e:
 
@@ -302,7 +331,7 @@ def run_scraper(gstin):
 
         driver.quit()
 
-        # Source information
+        # Source Information
         if len(final_data["websites_checked"]) > 1:
 
             final_data["source"] = "Multiple Sources"
@@ -315,7 +344,6 @@ def run_scraper(gstin):
 
             final_data["source"] = "No Source"
 
-        # Additional project statistics
         final_data["website_status"] = website_status
 
         final_data["total_websites_checked"] = len(
@@ -324,11 +352,6 @@ def run_scraper(gstin):
 
         final_data["successful_sources"] = ", ".join(
             final_data["websites_checked"]
-        )
-
-        final_data["response_time"] = round(
-            time.time() - start_time,
-            2
         )
 
         useful_fields = [
@@ -347,9 +370,7 @@ def run_scraper(gstin):
 
                 "successful_sources",
 
-                "total_websites_checked",
-
-                "response_time"
+                "total_websites_checked"
 
             ]
 
@@ -377,13 +398,15 @@ def run_scraper(gstin):
 
     except Exception as e:
 
-        try:
+        if driver:
 
-            driver.quit()
+            try:
 
-        except:
+                driver.quit()
 
-            pass
+            except:
+
+                pass
 
         return {
 
@@ -392,19 +415,6 @@ def run_scraper(gstin):
             "message": str(e)
 
         }
-def get_value_by_anchor(driver, anchor):
-
-    try:
-
-        xpath = f"//span[@id='{anchor}']/following-sibling::h4/following-sibling::small"
-
-        element = driver.find_element(By.XPATH,xpath)
-
-        return element.text.strip()
-
-    except:
-
-        return None
 def get_table_value(driver, heading):
 
     try:
