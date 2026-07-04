@@ -18,11 +18,17 @@ from selenium.common.exceptions import (
     NoSuchElementException,
     WebDriverException
 )
+from webdriver_manager.chrome import ChromeDriverManager
+
+CHROME_SERVICE = Service(ChromeDriverManager().install())
 def create_driver():
 
     chrome_options = Options()
 
-    # Run in background (no Chrome window)
+    # Faster page loading
+    chrome_options.page_load_strategy = "eager"
+
+    # Run Chrome in background
     chrome_options.add_argument("--headless=new")
 
     # Browser settings
@@ -30,6 +36,15 @@ def create_driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+
+    # Faster execution
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-popup-blocking")
+    chrome_options.add_argument("--disable-notifications")
+    chrome_options.add_argument("--disable-infobars")
+    chrome_options.add_argument("--disable-logging")
+    chrome_options.add_argument("--log-level=3")
+    chrome_options.add_argument("--mute-audio")
 
     # Avoid Selenium detection
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
@@ -42,33 +57,42 @@ def create_driver():
         False
     )
 
-    # Disable unnecessary browser features
-    chrome_options.add_argument("--disable-notifications")
-    chrome_options.add_argument("--disable-popup-blocking")
-    chrome_options.add_argument("--disable-infobars")
+    # Disable loading unnecessary resources
+    prefs = {
 
-    # Set a realistic User-Agent
+        "profile.managed_default_content_settings.images": 2,
+        "profile.managed_default_content_settings.notifications": 2,
+        "profile.managed_default_content_settings.geolocation": 2,
+        "profile.managed_default_content_settings.plugins": 2,
+        "profile.managed_default_content_settings.popups": 2
+
+    }
+
+    chrome_options.add_experimental_option("prefs", prefs)
+
+    # Realistic browser identity
     chrome_options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/138.0.0.0 Safari/537.36"
     )
 
-    driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),
-        options=chrome_options
-    )
+    driver = webdriver.Chrome(service=CHROME_SERVICE,options=chrome_options)
 
-    # Hide webdriver flag
+    # Hide webdriver property
     driver.execute_script("""
+
         Object.defineProperty(navigator, 'webdriver', {
+
             get: () => undefined
-        })
+
+        });
+
     """)
 
-    # Timeouts
-    driver.set_page_load_timeout(40)
-    driver.implicitly_wait(5)
+    # Faster timeouts
+    driver.set_page_load_timeout(12)
+    driver.implicitly_wait(2)
 
     return driver
 
@@ -207,7 +231,7 @@ def has_sufficient_data(data):
 
     return filled >= 4
 
-def run_scraper(gstin):
+def gst_search(gstin):
 
     gstin = gstin.strip().upper()
 
@@ -481,6 +505,22 @@ def get_info_cell(driver, label):
         pass
 
     return None
+def get_value_by_anchor(driver, anchor):
+
+    try:
+
+        xpath = f"//span[@id='{anchor}']/following-sibling::h4/following-sibling::small"
+
+        element = driver.find_element(
+            By.XPATH,
+            xpath
+        )
+
+        return element.text.strip()
+
+    except:
+
+        return None
 def search_cleartax(driver, gstin):
 
     print("\n-------------------------------")
@@ -498,7 +538,7 @@ def search_cleartax(driver, gstin):
         driver.get("https://cleartax.in/gst-number-search/")
 
         # Wait for search box
-        search_box = WebDriverWait(driver,20).until(
+        search_box = WebDriverWait(driver,8).until(
 
             EC.presence_of_element_located(
                 (By.ID,"input")
@@ -512,7 +552,7 @@ def search_cleartax(driver, gstin):
 
         # Click SEARCH button
 
-        search_button = WebDriverWait(driver,20).until(
+        search_button = WebDriverWait(driver,8).until(
 
             EC.element_to_be_clickable(
 
@@ -528,7 +568,7 @@ def search_cleartax(driver, gstin):
 
         # Wait until Business Name appears
 
-        WebDriverWait(driver,20).until(
+        WebDriverWait(driver,8).until(
 
             EC.presence_of_element_located(
 
@@ -641,7 +681,7 @@ def search_gstverify(driver, gstin):
 
         driver.get("https://gstverify.co.in/")
 
-        search_box = WebDriverWait(driver,20).until(
+        search_box = WebDriverWait(driver,8).until(
 
             EC.presence_of_element_located(
 
@@ -663,7 +703,7 @@ def search_gstverify(driver, gstin):
 
         ).click()
 
-        WebDriverWait(driver,20).until(
+        WebDriverWait(driver,8).until(
 
             EC.presence_of_element_located(
 
@@ -741,7 +781,7 @@ def search_cashfree(driver, gstin):
         )
 
         # Wait for input box
-        search_box = WebDriverWait(driver,20).until(
+        search_box = WebDriverWait(driver,8).until(
 
             EC.presence_of_element_located(
 
@@ -772,7 +812,7 @@ def search_cashfree(driver, gstin):
         print("GST Submitted")
 
         # Wait until Legal Name appears
-        WebDriverWait(driver,20).until(
+        WebDriverWait(driver,8).until(
 
             EC.presence_of_element_located(
 
@@ -871,7 +911,7 @@ def search_razorpay(driver, gstin):
 
         driver.get("https://razorpay.com/gst-number-search/")
 
-        search_box = WebDriverWait(driver,20).until(
+        search_box = WebDriverWait(driver,8).until(
             EC.presence_of_element_located(
                 (By.CSS_SELECTOR, "input[placeholder]")
             )
@@ -885,7 +925,7 @@ def search_razorpay(driver, gstin):
             "//button[@type='submit']"
         ).click()
 
-        WebDriverWait(driver,20).until(
+        WebDriverWait(driver,8).until(
             EC.presence_of_element_located(
                 (
                     By.XPATH,
@@ -943,7 +983,7 @@ def search_mastersindia(driver, gstin):
         )
 
         # Wait for search box
-        search_box = WebDriverWait(driver,20).until(
+        search_box = WebDriverWait(driver,8).until(
 
             EC.presence_of_element_located(
 
@@ -972,7 +1012,7 @@ def search_mastersindia(driver, gstin):
 
         # Wait for result table
 
-        WebDriverWait(driver,20).until(
+        WebDriverWait(driver,8).until(
 
             EC.presence_of_element_located(
 
@@ -1078,7 +1118,7 @@ def search_tally(driver,gstin):
 
         driver.get("https://tallysolutions.com/business-tools-templates/gstin-verification-search/")
 
-        WebDriverWait(driver,20).until(
+        WebDriverWait(driver,8).until(
             EC.presence_of_element_located((By.ID,"gstin"))
         )
 
@@ -1086,7 +1126,7 @@ def search_tally(driver,gstin):
 
         driver.find_element(By.ID,"generateDetailsBtn").click()
 
-        time.sleep(8)
+        WebDriverWait(driver,5).until(EC.presence_of_element_located((...)))
 
         with open("tally.html","w",encoding="utf-8") as f:
             f.write(driver.page_source)
@@ -1145,3 +1185,178 @@ def search_tally(driver,gstin):
         print(e)
 
         return None
+
+def search_company(driver, company_name):
+
+    print("\n-------------------------------")
+    print("Searching Company Name")
+    print("-------------------------------")
+
+    driver.get("https://cleartax.in/gst-number-search/")
+
+    wait = WebDriverWait(driver, 8)
+
+    try:
+
+        search_box = wait.until(
+            EC.presence_of_element_located(
+                (By.ID, "input")
+            )
+        )
+
+        search_box.clear()
+        search_box.send_keys(company_name)
+
+        driver.find_element(
+            By.XPATH,
+            "//button[contains(text(),'SEARCH')]"
+        ).click()
+
+        print("Company Search Submitted")
+
+    except Exception as e:
+
+        print("Unable to search company :", e)
+        return None
+
+    try:
+
+        wait.until(
+            EC.presence_of_element_located(
+                (
+                    By.XPATH,
+                    "//div[contains(@class,'items-start') and contains(@class,'cursor-pointer')]"
+                )
+            )
+        )
+
+        print("Company List Loaded")
+
+    except:
+
+        print("No companies found.")
+        return None
+
+    companies = []
+
+    try:
+
+        rows = driver.find_elements(By.XPATH,"//div[contains(@class,'items-start') and contains(@class,'cursor-pointer')]")
+
+        rows = rows[:5]
+
+        print("Rows Found :", len(rows))
+
+        for row in rows:
+
+            try:
+
+                name = row.find_element(
+                    By.XPATH,
+                    ".//div[contains(@class,'font-semibold')]"
+                ).text.strip()
+
+                state = row.find_element(
+                    By.XPATH,
+                    ".//div[contains(@class,'text-font-200')]"
+                ).text.strip()
+
+                gstin = row.find_element(
+                    By.XPATH,
+                    ".//div[contains(@class,'w-1/4')]"
+                ).text.strip()
+
+                companies.append({
+
+                    "business_name": name,
+
+                    "gstin": gstin,
+
+                    "state": state
+
+                })
+
+                print(name, state, gstin)
+
+            except Exception as e:
+
+                print("Skipping Row :", e)
+
+        print(f"Found {len(companies)} companies")
+
+        return companies
+
+    except Exception as e:
+
+        print("Extraction Error :", e)
+
+        return None
+def run_scraper(query):
+
+    query = query.strip()
+
+    # GSTIN Search
+    if validate_gstin(query):
+
+        return gst_search(query.upper())
+
+    # Company Name Search
+    driver = None
+
+    try:
+
+        driver = create_driver()
+
+        companies = search_company(driver, query)
+
+        driver.quit()
+
+        if not companies:
+
+            return {
+
+                "status": "failed",
+
+                "message": "No companies found."
+
+            }
+
+        return {
+
+            "status": "company_list",
+
+            "companies": companies
+
+        }
+
+    except Exception as e:
+
+        if driver:
+
+            try:
+
+                driver.quit()
+
+            except:
+
+                pass
+
+        return {
+
+            "status": "failed",
+
+            "message": str(e)
+
+        }
+    
+def main():
+
+    query = input("Enter GSTIN or Company Name: ")
+
+    result = run_scraper(query)
+
+    print(result)
+
+
+if __name__ == "__main__":
+    main()
