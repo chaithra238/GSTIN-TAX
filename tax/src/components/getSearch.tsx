@@ -12,24 +12,108 @@ export default function GetSearch() {
 
     const [result, setResult] = useState<any>(null);
 
+    const [companies, setCompanies] = useState<any[]>([]);
+
+    const loadingMessages = [
+        "Reading your search request...",
+        "Searching GST registration records...",
+        "Checking business information...",
+        "Validating registration details...",
+        "Organizing available GST data...",
+        "Preparing your GST report..."
+    ];
+
+    const [loadingText, setLoadingText] = useState(loadingMessages[0]);
+    
+    const fetchGSTDetails = async (gstin: string) => {
+
+    setLoading(true);
+
+    setLoadingText(loadingMessages[0]);
+
+    let index = 0;
+
+    const interval = setInterval(() => {
+
+        index = (index + 1) % loadingMessages.length;
+
+        setLoadingText(loadingMessages[index]);
+
+    }, 1800);
+
+    setCompanies([]);
+
+    setResult(null);
+
+    setError("");
+
+    try {
+
+        const response = await axios.get(
+
+            "http://127.0.0.1:8000/api/search/",
+
+            {
+
+                params: {
+
+                    query: gstin
+
+                }
+
+            }
+
+        );
+
+        setResult(response.data);
+
+    }
+
+    catch {
+
+        setError("Unable to fetch GST Details.");
+
+    }
+
+    finally {
+
+        clearInterval(interval);
+
+        setLoading(false);
+
+    }
+
+};
+
     const handleSearch = async (e: React.FormEvent) => {
 
         e.preventDefault();
 
         setError("");
         setResult(null);
+        setCompanies([]);
 
-        const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{3}$/;
+       if (query.trim() === "") {
 
-        if (!gstRegex.test(query)) {
+    setError("Please enter GSTIN or Company Name.");
 
-            setError("Please enter a valid GSTIN.");
+    return;
 
-            return;
-
-        }
+}
 
         setLoading(true);
+
+        setLoadingText(loadingMessages[0]);
+
+        let index = 0;
+
+        const interval = setInterval(() => {
+
+            index = (index + 1) % loadingMessages.length;
+
+            setLoadingText(loadingMessages[index]);
+
+        }, 1800);
 
         try {
 
@@ -44,7 +128,22 @@ export default function GetSearch() {
 
             console.log(response.data);
 
-            setResult(response.data);
+            if (response.data.status === "company_list") {
+
+    setCompanies(response.data.companies);
+
+}
+
+else if (response.data.status === "success") {
+
+    setResult(response.data);
+
+}
+else {
+
+    setError(response.data.message);
+
+}
 
         }
 
@@ -58,6 +157,8 @@ export default function GetSearch() {
 
         finally {
 
+            clearInterval(interval);
+
             setLoading(false);
 
         }
@@ -70,11 +171,11 @@ export default function GetSearch() {
 
             <div className="card">
 
-                <h1>GST Search Engine</h1>
+                <h1>GST Intelligence Search</h1>
 
                 <p className="subtitle">
 
-                    Search GST Details from Multiple Verification Portals
+                    Search GSTIN or business name and view verified registration details.
 
                 </p>
 
@@ -84,14 +185,13 @@ export default function GetSearch() {
 
                         type="text"
 
-                        placeholder="Enter GSTIN"
+                        placeholder="Search GSTIN or Company Name"
 
                         value={query}
 
                         onChange={(e) =>
-                            setQuery(e.target.value.toUpperCase())
-                        }
-
+    setQuery(e.target.value)
+}
                     />
 
                     <button type="submit">
@@ -110,7 +210,9 @@ export default function GetSearch() {
 
                     <div className="spinner"></div>
 
-                    <p>Searching GST Details...</p>
+                    <h3>{loadingText}</h3>
+
+                    <p>Please wait while we retrieve GST information.</p>
 
                 </div>
 
@@ -126,10 +228,68 @@ export default function GetSearch() {
 
             )}
 
-            {result && result.status === "success" && (
+           {companies.length > 0 && (
+
+<div className="resultCard">
+
+    <h2>🏢 {companies.length} Matching Businesses Found</h2>
+
+    <p className="companySubtitle">
+
+        Choose the correct business to retrieve complete GST details.
+
+    </p>
+
+    <div className="companyList">
+
+        {companies.map((company, index) => (
+
+            <div
+                key={index}
+                className="companyCard"
+            >
+
+                <div className="companyInfo">
+
+                    <h3>🏢 {company.business_name}</h3>
+
+                    <p>📍 {company.state}</p>
+
+                    <p>
+
+                        <strong>GSTIN</strong>
+
+                        <br />
+
+                        {company.gstin}
+
+                    </p>
+
+                </div>
+
+               <button
+    onClick={() => fetchGSTDetails(company.gstin)}
+>
+
+    View Complete GST Profile →
+
+</button>
+
+            </div>
+
+        ))}
+
+    </div>
+
+</div>
+
+)}
+
+{result && result.status === "success" && (
 
 <div className="dashboard">
 
+    
     <div className="section">
 
         <h2>🏢 Business Information</h2>

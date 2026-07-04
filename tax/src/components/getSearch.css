@@ -110,6 +110,24 @@ button:hover{
 
     text-align:center;
 
+    color:#003366;
+
+}
+
+.loading h3{
+
+    margin-top:18px;
+
+    font-size:22px;
+
+}
+
+.loading p{
+
+    margin-top:8px;
+
+    color:#64748b;
+
 }
 
 .spinner{
@@ -184,9 +202,19 @@ button:hover{
 
     text-align:center;
 
-    margin-bottom:25px;
+    margin-bottom:10px;
 
     color:#003366;
+
+}
+
+.companySubtitle{
+
+    text-align:center;
+
+    color:#64748b;
+
+    margin-bottom:25px;
 
 }
 
@@ -267,13 +295,86 @@ button{
 width:100%;
 
 }
+.dashboard{
+
+    width:95%;
+
+}
+
+.fullWidth{
+
+    grid-column:auto;
+
+}
 
 }
 .dashboard{
 
-    width:1100px;
+    width:100%;
+
+    max-width:1100px;
 
     margin-top:40px;
+
+}
+
+.dashboardHeader{
+
+    background:#ffffff;
+
+    padding:28px 30px;
+
+    margin-bottom:22px;
+
+    border-radius:15px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+    border-left:5px solid #16a34a;
+
+}
+
+.dashboardHeader h2{
+
+    color:#003366;
+
+    margin-bottom:8px;
+
+}
+
+.dashboardHeader p{
+
+    color:#64748b;
+
+}
+
+.sourceCard{
+
+    background:#ffffff;
+
+    padding:24px 30px;
+
+    margin-bottom:25px;
+
+    border-radius:15px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.sourceCard h3{
+
+    color:#003366;
+
+    margin-bottom:14px;
+
+}
+
+.sourceCard p{
+
+    color:#334155;
+
+    margin-bottom:8px;
 
 }
 
@@ -360,5 +461,159 @@ width:100%;
     border-radius:30px;
 
     font-weight:bold;
+
+}
+.companyList{
+
+display:flex;
+
+flex-direction:column;
+
+gap:16px;
+
+margin-top:30px;
+
+font-family:"Inter","Segoe UI",Roboto,Arial,sans-serif;
+
+}
+
+.companyCard{
+
+    background:#ffffff;
+
+    padding:22px 24px;
+
+    border-radius:12px;
+
+    box-shadow:0 5px 18px rgba(15,23,42,.08);
+
+    transition:.25s;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+    border:1px solid #e5edf7;
+
+}
+.companyCard:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+}
+
+.companyCard h3{
+
+color:#0f2f56;
+
+font-size:21px;
+
+font-weight:700;
+
+line-height:1.35;
+
+margin-bottom:12px;
+
+}
+
+.companyInfo p{
+
+    color:#526174;
+
+    font-size:15px;
+
+    font-weight:500;
+
+    margin-bottom:10px;
+
+    line-height:1.45;
+
+}
+
+.companyInfo strong{
+
+    color:#0f2f56;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    letter-spacing:.8px;
+
+}
+
+.companyInfo p:last-child{
+
+    background:#f6f9fc;
+
+    color:#1e293b;
+
+    display:inline-block;
+
+    padding:10px 12px;
+
+    border-radius:8px;
+
+    border:1px solid #e2e8f0;
+
+    font-family:"Cascadia Code","Consolas","Courier New",monospace;
+
+    font-size:15px;
+
+    font-weight:600;
+
+}
+
+.companyCard button{
+
+    margin-top:0;
+
+    width:auto;
+
+    min-width:230px;
+
+    padding:12px;
+
+    background:#0066ff;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+}
+
+@media(max-width:650px){
+
+.companyCard{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+.companyCard button{
+
+    width:100%;
+
+    min-width:0;
+
+}
 
 }
